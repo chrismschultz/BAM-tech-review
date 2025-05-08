@@ -34,7 +34,10 @@ namespace StargateAPI.Business.Commands
 
             if (person is null) throw new BadHttpRequestException("Bad Request");
 
-            var verifyNoPreviousDuty = _context.AstronautDuties.FirstOrDefault(z => z.DutyTitle == request.DutyTitle && z.DutyStartDate == request.DutyStartDate);
+            // Compare against date in case the start date got created with a Time as per SeedData
+            var verifyNoPreviousDuty = _context.AstronautDuties.FirstOrDefault(z => 
+                z.DutyTitle == request.DutyTitle && 
+                z.DutyStartDate.Date == request.DutyStartDate.Date);
 
             if (verifyNoPreviousDuty is not null) throw new BadHttpRequestException("Bad Request");
 
@@ -44,6 +47,8 @@ namespace StargateAPI.Business.Commands
 
     public class CreateAstronautDutyHandler : IRequestHandler<CreateAstronautDuty, CreateAstronautDutyResult>
     {
+        private const string RetiredDutyTitle = "RETIRED";
+
         private readonly StargateContext _context;
 
         public CreateAstronautDutyHandler(StargateContext context)
@@ -68,9 +73,9 @@ namespace StargateAPI.Business.Commands
                 astronautDetail.CurrentDutyTitle = request.DutyTitle;
                 astronautDetail.CurrentRank = request.Rank;
                 astronautDetail.CareerStartDate = request.DutyStartDate.Date;
-                if (request.DutyTitle == "RETIRED")
+                if (request.DutyTitle == RetiredDutyTitle)
                 {
-                    astronautDetail.CareerEndDate = request.DutyStartDate.Date;
+                    astronautDetail.CareerEndDate = request.DutyStartDate.AddDays(-1).Date; // Business logic for RETIRED
                 }
 
                 await _context.AstronautDetails.AddAsync(astronautDetail);
@@ -80,7 +85,7 @@ namespace StargateAPI.Business.Commands
             {
                 astronautDetail.CurrentDutyTitle = request.DutyTitle;
                 astronautDetail.CurrentRank = request.Rank;
-                if (request.DutyTitle == "RETIRED")
+                if (request.DutyTitle == RetiredDutyTitle)
                 {
                     astronautDetail.CareerEndDate = request.DutyStartDate.AddDays(-1).Date;
                 }

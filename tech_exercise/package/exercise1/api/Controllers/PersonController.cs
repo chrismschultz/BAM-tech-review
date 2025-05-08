@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using StargateAPI.Business.Commands;
+using StargateAPI.Business.Dtos;
 using StargateAPI.Business.Queries;
 using System.Net;
 
@@ -85,6 +86,30 @@ namespace StargateAPI.Controllers
                 });
             }
 
+        }
+
+        [HttpPut("{currentName}")]
+        public async Task<IActionResult> UpdatePerson([FromRoute] string currentName, [FromBody] UpdatePersonRequest request)
+        {
+            try
+            {
+                var result = await _mediator.Send(new UpdatePerson()
+                { 
+                    CurrentName = currentName,
+                    NewName = request.NewName 
+                });
+
+                return this.GetResponse(result);
+            }
+            catch (Exception ex)
+            {
+                return this.GetResponse(new BaseResponse()
+                {
+                    Message = ex.Message,
+                    Success = false,
+                    ResponseCode = (int)HttpStatusCode.InternalServerError
+                });
+            }
         }
     }
 }

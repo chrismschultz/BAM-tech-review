@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StargateAPI.Business.Data;
 
@@ -10,9 +11,11 @@ using StargateAPI.Business.Data;
 namespace StargateAPI.Migrations
 {
     [DbContext(typeof(StargateContext))]
-    partial class StargateContextModelSnapshot : ModelSnapshot
+    [Migration("20250508153503_SeedInitialData")]
+    partial class SeedInitialData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -51,7 +54,7 @@ namespace StargateAPI.Migrations
                         new
                         {
                             Id = 1,
-                            CareerStartDate = new DateTime(2025, 5, 8, 11, 3, 42, 497, DateTimeKind.Local).AddTicks(7566),
+                            CareerStartDate = new DateTime(2025, 5, 8, 9, 35, 2, 946, DateTimeKind.Local).AddTicks(515),
                             CurrentDutyTitle = "Commander",
                             CurrentRank = "1LT",
                             PersonId = 1
@@ -91,7 +94,7 @@ namespace StargateAPI.Migrations
                         new
                         {
                             Id = 1,
-                            DutyStartDate = new DateTime(2025, 5, 8, 11, 3, 42, 497, DateTimeKind.Local).AddTicks(7646),
+                            DutyStartDate = new DateTime(2025, 5, 8, 9, 35, 2, 946, DateTimeKind.Local).AddTicks(585),
                             DutyTitle = "Commander",
                             PersonId = 1,
                             Rank = "1LT"
@@ -109,9 +112,6 @@ namespace StargateAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Person");
 
