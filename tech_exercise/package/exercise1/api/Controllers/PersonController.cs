@@ -101,6 +101,15 @@ namespace StargateAPI.Controllers
 
                 return this.GetResponse(result);
             }
+            catch (ArgumentException ex)
+            {
+                return this.GetResponse(new BaseResponse()
+                {
+                    Message = ex.Message,
+                    Success = false,
+                    ResponseCode = (int)HttpStatusCode.NotFound
+                });
+            }
             catch (Exception ex)
             {
                 return this.GetResponse(new BaseResponse()

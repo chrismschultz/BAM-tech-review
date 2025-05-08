@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Data;
+using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
@@ -25,7 +26,10 @@ namespace StargateAPI.Business.Commands
         public Task Process(UpdatePerson request, CancellationToken cancellationToken)
         {
             var person = _context.People.AsNoTracking().FirstOrDefault(x => x.Name == request.CurrentName);
-            if (person is null) throw new BadHttpRequestException("Bad Request");
+            if (person is null)
+            {
+                throw new ArgumentException($"Person {request.CurrentName} does not exist");
+            }
 
             return Task.CompletedTask;
         }
