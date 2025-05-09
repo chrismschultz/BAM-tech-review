@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddRequestPreProcessor<UpdatePersonPreProcessor>();
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 });
+
+builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 
 var app = builder.Build();
 

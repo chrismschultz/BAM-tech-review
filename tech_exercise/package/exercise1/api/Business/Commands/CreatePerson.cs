@@ -2,6 +2,7 @@
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Data.Repositories;
 using StargateAPI.Controllers;
 
 namespace StargateAPI.Business.Commands
@@ -13,46 +14,37 @@ namespace StargateAPI.Business.Commands
 
     public class CreatePersonPreProcessor : IRequestPreProcessor<CreatePerson>
     {
-        private readonly StargateContext _context;
-        public CreatePersonPreProcessor(StargateContext context)
+        private readonly IPersonRepository _repo;
+
+        public CreatePersonPreProcessor(IPersonRepository repository)
         {
-            _context = context;
+            _repo = repository;
         }
-        public Task Process(CreatePerson request, CancellationToken cancellationToken)
+
+        public async Task Process(CreatePerson request, CancellationToken cancellationToken)
         {
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
-
-            if (person is not null) throw new BadHttpRequestException($"Person {request.Name} already exists");
-
-            return Task.CompletedTask;
+            var exists = await _repo.ExistsAsync(request.Name, cancellationToken);
+            if (exists)
+            {
+                throw new BadHttpRequestException($"Person {request.Name} already exists.");
+            }
         }
     }
 
     public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonResult>
     {
-        private readonly StargateContext _context;
+        private readonly IPersonRepository _repo;
 
-        public CreatePersonHandler(StargateContext context)
+        public CreatePersonHandler(IPersonRepository repository)
         {
-            _context = context;
+            _repo = repository;
         }
-        public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken cancellationToken)
+
+        public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken ct)
         {
+            var personId = await _repo.CreateAsync(request.Name, ct);
 
-                var newPerson = new Person()
-                {
-                   Name = request.Name
-                };
-
-                await _context.People.AddAsync(newPerson);
-
-                await _context.SaveChangesAsync();
-
-                return new CreatePersonResult()
-                {
-                    Id = newPerson.Id
-                };
-          
+            return new CreatePersonResult { Id = personId };
         }
     }
 
