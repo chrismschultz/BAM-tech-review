@@ -8,12 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-//builder.Logging.ClearProviders();
+builder.Logging.ClearProviders();
 //builder.Logging.AddConsole();
-//builder.Logging.AddDebug();
-//builder.Logging.AddEventSourceLogger();
-//builder.Logging.AddProvider(new DatabaseLoggerProvider(
-//    builder.Configuration.GetConnectionString("StarbaseApiDatabase")));
+builder.Logging.AddProvider(new ConsoleLoggerProvider());
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

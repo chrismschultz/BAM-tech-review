@@ -12,7 +12,6 @@
         public ILogger CreateLogger(string categoryName)
         {
             return new DatabaseLogger(_connectionString, categoryName);
-            throw new NotImplementedException();
         }
 
         public void Dispose()

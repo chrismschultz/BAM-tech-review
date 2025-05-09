@@ -34,14 +34,17 @@ namespace StargateAPI.Business.Commands
     public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonResult>
     {
         private readonly IPersonRepository _repo;
+        private readonly ILogger<CreatePersonHandler> _logger;
 
-        public CreatePersonHandler(IPersonRepository repository)
+        public CreatePersonHandler(IPersonRepository repository, ILogger<CreatePersonHandler> logger)
         {
             _repo = repository;
+            _logger = logger;
         }
 
         public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken ct)
         {
+            _logger.LogInformation($"Handling Create Person request for {request.Name}");
             var personId = await _repo.CreateAsync(request.Name, ct);
 
             return new CreatePersonResult { Id = personId };
