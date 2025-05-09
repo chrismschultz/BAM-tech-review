@@ -1,11 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Data.Logging;
 using StargateAPI.Business.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
+//builder.Logging.AddDebug();
+//builder.Logging.AddEventSourceLogger();
+//builder.Logging.AddProvider(new DatabaseLoggerProvider(
+//    builder.Configuration.GetConnectionString("StarbaseApiDatabase")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
