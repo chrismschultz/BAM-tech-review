@@ -3,6 +3,7 @@ using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Data.Repositories;
 using StargateAPI.Controllers;
 
 namespace StargateAPI.Business.Commands
@@ -16,16 +17,16 @@ namespace StargateAPI.Business.Commands
 
     public class UpdatePersonPreProcessor : IRequestPreProcessor<UpdatePerson>
     {
-        private readonly StargateContext _context;
+        private readonly IPersonRepository _repo;
 
-        public UpdatePersonPreProcessor(StargateContext context)
+        public UpdatePersonPreProcessor(IPersonRepository repository)
         {
-            _context = context;
+            _repo = repository;
         }
 
         public Task Process(UpdatePerson request, CancellationToken cancellationToken)
         {
-            var person = _context.People.AsNoTracking().FirstOrDefault(x => x.Name == request.CurrentName);
+            var person = _repo.GetByCurrentName(request.CurrentName, cancellationToken);
             if (person is null)
             {
                 throw new ArgumentException($"Person {request.CurrentName} does not exist");
@@ -37,22 +38,16 @@ namespace StargateAPI.Business.Commands
 
     public class UpdatePersonHandler : IRequestHandler<UpdatePerson, UpdatePersonResult>
     {
-        private readonly StargateContext _context;
+        private readonly IPersonRepository _repo;
 
-        public UpdatePersonHandler(StargateContext context)
+        public UpdatePersonHandler(IPersonRepository repository)
         {
-            _context = context;
+            _repo = repository;
         }
 
         public async Task<UpdatePersonResult> Handle(UpdatePerson request, CancellationToken cancellationToken)
         {
-            var person = await _context.People.FirstAsync(x => x.Name == request.CurrentName, cancellationToken);
-            person.Name = request.NewName;
-
-            _context.People.Update(person);
-
-            await _context.SaveChangesAsync();
-
+            var person = await _repo.UpdateAsync(request.CurrentName, request.NewName, cancellationToken);
             return new UpdatePersonResult
             {
                 Id = person.Id,
